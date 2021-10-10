@@ -5,11 +5,19 @@ import { schema, root } from "./api/schema";
 import { createConnection } from 'typeorm';
 import cookieParser from 'cookie-parser'
 import Access from './entity/access'
+import cors from 'cors';
 
 dotenv.config();
 createConnection().then(async connection => {
   await Access.load(); // loads all entries in the access table into the access class
   const app = express();
+
+  const corsOptions = {
+    origin: process.env.CORS_ORIGIN!,
+    credentials: true,
+    optionsSuccessStatus: 200 // some legacy browsers (IE11, various SmarTVs) choke on 204
+  };
+  app.use(cors(corsOptions))
   app.use(express.json());
   app.use(cookieParser());
 
