@@ -1,4 +1,3 @@
-// access manages all the types of acces that the system allows
 import { sign, verify } from "jsonwebtoken";
 import Database from "../utils/database";
 import {
@@ -115,7 +114,7 @@ export default class Access {
     return d;
   }
 
-    // used when integrating into schema
+  // used when integrating into schema
   static idFromName(name: string): number {
     if (!accessNames.includes(name))
       throw new Error(`Access name "${name}" not defined in database`);

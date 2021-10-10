@@ -1,23 +1,24 @@
-// new code
-    
-// controls all the info for a user
-import Database from '../utils/database';
-import Result from '../model/result';
-import { hash, compare } from 'bcryptjs';
-import { v4 as uuidv4 } from 'uuid';
-import { Entity, PrimaryGeneratedColumn, Index, Column, CreateDateColumn, UpdateDateColumn, DeleteDateColumn } from 'typeorm';
-import { JWT, JWTActionType } from '../utils/jwt';
+import Database from "../utils/database";
+import Result from "../utils/result";
+import { hash, compare } from "bcryptjs";
+import { v4 as uuidv4 } from "uuid";
+import {
+  Entity,
+  PrimaryGeneratedColumn,
+  Index,
+  Column,
+  CreateDateColumn,
+  UpdateDateColumn,
+  DeleteDateColumn,
+} from "typeorm";
 
-// table
-@Entity('users')
+@Entity("users")
 export default class User {
-
-    // generate user id autoincrement
   @PrimaryGeneratedColumn()
   id: number;
 
   @Index({ unique: true })
-  @Column({ type: 'uuid', unique: true, nullable: false })
+  @Column({ type: "uuid", unique: true, nullable: false })
   ukey: string;
 
   @Index({ unique: true })
@@ -30,17 +31,16 @@ export default class User {
   @Column({ nullable: false, default: false })
   confirmed: boolean;
 
-    // used to revoke expired access tokens
-  @Column({ name: 'refresh_index', nullable: false, default: 0 })
+  @Column({ name: "refresh_index", nullable: false, default: 0 })
   refreshIndex: number;
 
-  @CreateDateColumn({ name: 'created_at' })
+  @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
-  @UpdateDateColumn({ name: 'updated_at' })
+  @UpdateDateColumn({ name: "updated_at" })
   updatedAt: Date;
 
-  @DeleteDateColumn({ name: 'deleted_at' })
+  @DeleteDateColumn({ name: "deleted_at" })
   deletedAt?: Date;
 
   constructor(email: string, password: string, refreshIndex: number) {
@@ -54,9 +54,57 @@ export default class User {
     this.updatedAt = new Date();
   }
 
-  static async getByUserKey(ukey: string): Promise<User | undefined> {
+  static async register(
+    email: string,
+    password: string,
+    confirmation: string
+  ): Promise<Result<User>> {
+    if (password != confirmation)
+      return new Result<User>(new Error("Passwords do not match"), 400);
+
+    const u = await User.getByEmail(email);
+    if (u != undefined) return new Result<User>(new Error("User exists"), 400);
+
+    try {
+      const hpass = await hash(password, 12);
+      const user = new User(email, hpass, 0);
+      user.ukey = uuidv4();
+      if (await user.save()) return new Result<User>(user, 201);
+      return new Result<User>(new Error("Registration failed"), 500);
+    } catch (err) {
+      console.log(err);
+      return new Result<User>(new Error("Registration failed"), 500);
+    }
+  }
+
+  static async login(email: string, password: string): Promise<Result<User>> {
+    const user = await User.getByEmail(email);
+    if (user == undefined)
+      return new Result<any>(new Error("Invalid credentials"), 400);
+
+    if (!user.confirmed)
+      return new Result<any>(new Error("User not confirmed"), 401);
+
+    try {
+      const valid = await compare(password, user.password);
+      return valid
+        ? new Result(user, 200)
+        : new Result<any>(new Error("Invalid credentials"), 400);
+    } catch (err) {
+      console.log(err);
+      return new Result<any>(new Error("Login failed"), 500);
+    }
+  }
+
+  static async getByUserKey(
+    ukey: string,
+    refreshIndex: number
+  ): Promise<User | undefined> {
     const db = new Database<User>(User);
-    return await db.get({ ukey });
+    const user = await db.get({ ukey });
+    return user == undefined || user.refreshIndex != refreshIndex
+      ? undefined
+      : user;
   }
 
   static async getByEmail(email: string): Promise<User | undefined> {
@@ -69,50 +117,42 @@ export default class User {
     return await db.save(this);
   }
 
-  static async register(email: string, password: string, confirmation: string): Promise<Result<User>> {
-    if (password != confirmation)
-      return new Result<User>(new Error('Passwords do not match'), 400);
-
-    const u = await User.getByEmail(email);
-    if (u != undefined)
-      return new Result<User>(new Error('User exists'), 400);
-
-    try {
-      const hpass = await hash(password, 12);
-      const user = new User(email, hpass, 0);
-      user.ukey = uuidv4();
-      if (await user.save())
-        return new Result<User>(user, 201);
-      return new Result<User>(new Error('Registration failed'), 500);
-    } catch (err) {
-      console.log(err);
-      return new Result<User>(new Error('Registration failed'), 500);
-    }
+  async updateConfirmed(): Promise<Result<boolean>> {
+    if (this.confirmed)
+      return new Result<boolean>(new Error("Already confirmed"), 401);
+    const values = { confirmed: true };
+    const filter = `id = ${this.id}`;
+    const db = new Database<User>(User);
+    const success = await db.update("users", values, filter);
+    return success
+      ? new Result<boolean>(true, 200)
+      : new Result<boolean>(new Error("Confirmation failed"), 500);
   }
 
-  static async login(email: string, password: string): Promise<Result<any>> {
-    const user = await User.getByEmail(email);
-    if (user == undefined)
-      return new Result<any>(new Error('Invalid credentials'), 400);
-
-    if (!user.confirmed)
-      return new Result<any>(new Error('User not confirmed'), 401);
-
-    try {
-      const valid = await compare(password, user.password);
-      if (valid) {
-        const accessToken = JWT.encode(user.ukey, user.refreshIndex, JWTActionType.userAccess);
-        const refreshToken = JWT.encode(user.ukey, user.refreshIndex, JWTActionType.refreshAccess);
-        if (accessToken == undefined || refreshToken == undefined)
-          return new Result<any>(new Error('Login failed'), 500);
-        return new Result<any>({ ukey: user.ukey, refresh_token: refreshToken, access_token: accessToken }, 200);
-      }
-
-      return new Result<any>(new Error('Invalid credentials'), 400);
-    } catch (err) {
-      console.log(err);
-      return new Result<any>(new Error('Login failed'), 500);
-    }
+  async updatePassword(
+    oldPassword: string | undefined,
+    newPassword: string
+  ): Promise<Result<boolean>> {
+    // change password scenario
+    if (oldPassword != undefined && oldPassword == newPassword)
+      return new Result<boolean>(new Error("No password change"), 400);
+    const hpass = await hash(newPassword, 12);
+    const values = { password: hpass };
+    const filter = `id = ${this.id}`;
+    const db = new Database<User>(User);
+    const success = await db.update("users", values, filter);
+    return success
+      ? new Result<boolean>(true, 200)
+      : new Result<boolean>(new Error("Update password failed"), 500);
   }
 
+  async updateRefreshIndex(): Promise<Result<boolean>> {
+    const values = { refreshIndex: () => "refresh_index + 1" };
+    const filter = `id = ${this.id}`;
+    const db = new Database<User>(User);
+    const success = await db.update("users", values, filter);
+    return success
+      ? new Result(true, 200)
+      : new Result<boolean>(new Error("Refresh failed"), 500);
+  }
 }
