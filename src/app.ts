@@ -6,6 +6,7 @@ import { createConnection } from 'typeorm';
 import cookieParser from 'cookie-parser'
 import Access from './entity/access'
 import cors from 'cors';
+import path from 'path'
 
 dotenv.config();
 createConnection()
@@ -34,11 +35,16 @@ createConnection()
       }))
     );
 
+    app.use(express.static("public"));
+
+    // whenever any route except /graphql is hit it redirects to react's index.html in public folder
+    app.get("*", (req, res) => {
+      res.sendFile(path.resolve(__dirname, "public", "index.html"));
+    });
+
     app.listen(parseInt(process.env.APP_PORT!));
     console.log(
-      `Server started at url: http://localhost:${process.env.APP_PORT!}${
-        process.env.GRAPHQL_PATH
-      }`
+      `Server started`
     );
   })
   .catch((error) => {
