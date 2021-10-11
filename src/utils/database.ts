@@ -1,9 +1,3 @@
-// store and access info in db
-// getManager, Repository - which table were interacting with
-// ObjectType - which entity class
-
-// T- entity type
-
 import { getManager, Repository, ObjectType } from "typeorm";
 
 export default class Database<T> {
@@ -23,8 +17,6 @@ export default class Database<T> {
     }
   }
 
-
-  // more efficient to do sql statement rather than calling state fxn when updating
   async update(
     table: string,
     values: object,

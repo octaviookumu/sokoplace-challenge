@@ -40,8 +40,6 @@ export default class Access {
     this.createdAt = new Date();
   }
 
-  // called when creating our server
-  // loads all the rows within the access table
   static async load(): Promise<void> {
     if (accessItems.length > 0) return;
 
@@ -103,7 +101,6 @@ export default class Access {
     }
   }
 
-  // to know how long the jwt lives
   static refreshExpiration(): Date {
     if (!accessNames.includes(process.env.ACCESS_TYPE_REFRESH!))
       throw new Error("ACCESS_TYPE_REFRESH name not defined in database");
@@ -114,7 +111,6 @@ export default class Access {
     return d;
   }
 
-  // used when integrating into schema
   static idFromName(name: string): number {
     if (!accessNames.includes(name))
       throw new Error(`Access name "${name}" not defined in database`);

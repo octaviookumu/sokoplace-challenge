@@ -8,6 +8,8 @@ import {
   Observable,
 } from "@apollo/client";
 import { onError } from "@apollo/link-error";
+import { TokenRefreshLink } from "apollo-link-token-refresh";
+import JwtDecode from "jwt-decode";
 
 let authToken = "";
 const initial = {
@@ -75,8 +77,41 @@ function AppStateProvider({ children }: { children: ReactNode }) {
       })
   );
 
+  // interface MyToken {
+  //   name: string;
+  //   exp: string;
+  //   // whatever else is in the JWT.
+  // }
+
+  // client does all the communication to the server on behalf of the frontend
   const client = new ApolloClient({
     link: ApolloLink.from([
+      new TokenRefreshLink({
+        accessTokenField: "access_token",
+        isTokenValidOrUndefined: () => {
+          const token = appGetAuthToken();
+          if (token.length === 0) return true;
+          try {
+            const { exp } = JwtDecode<any>(token);
+            return Date.now() < exp * 1000;
+          } catch {
+            return false;
+          }
+        },
+        fetchAccessToken,
+        handleFetch: (accessToken) => {
+          console.log(`handleFetch: ${accessToken}`);
+          appSetAuthToken(accessToken);
+        },
+        handleResponse: (operation, accessTokenField) => {
+          console.log(`handleResponse: ${accessTokenField}`);
+          console.log(operation);
+        },
+        handleError: (err) => {
+          console.log(`handleError: ${err}`);
+          appSetLogout();
+        },
+      }),
       onError(({ graphQLErrors, networkError }) => {
         if (graphQLErrors === undefined || graphQLErrors[0].path === undefined)
           return;
@@ -110,3 +145,25 @@ function AppStateProvider({ children }: { children: ReactNode }) {
 }
 
 export default AppStateProvider;
+
+export const fetchAccessToken = async (): Promise<any> => {
+  const payload = {
+    operationName: "Refresh",
+    variables: {},
+    query: "mutation Refresh {\n refresh {\n access_token\n __typename\n}\n}\n",
+  };
+  return fetch("http://localhost:4000/graphql", {
+    method: "POST",
+    credentials: "include",
+    body: JSON.stringify(payload),
+    headers: {
+      "Content-Type": "application/json; charset=utf-8",
+      Accept: "application/json",
+    },
+  }).then(async (res) => {
+    const response = await res.json();
+    console.log("fetchAccessToken");
+    console.log(response.data.refresh);
+    return response.data.refresh;
+  });
+};

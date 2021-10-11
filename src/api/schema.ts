@@ -191,7 +191,7 @@ export const root = {
     const accessToken = Access.encode(
       user.ukey,
       user.refreshIndex,
-      process.env.ACCESS_TYPE_REFRESH!
+      process.env.ACCESS_TYPE_USER!
     );
     if (refreshToken == undefined || accessToken == undefined) {
       context.res.status(500);

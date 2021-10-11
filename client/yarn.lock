@@ -2,7 +2,7 @@
 # yarn lockfile v1
 
 
-"@apollo/client@^3.0.0-beta.23", "@apollo/client@^3.4.16":
+"@apollo/client@^3.0.0", "@apollo/client@^3.0.0-beta.23", "@apollo/client@^3.4.16":
   "integrity" "sha512-iF4zEYwvebkri0BZQyv8zfavPfVEafsK0wkOofa6eC2yZu50J18uTutKtC174rjHZ2eyxZ8tV7NvAPKRT+OtZw=="
   "resolved" "https://registry.npmjs.org/@apollo/client/-/client-3.4.16.tgz"
   "version" "3.4.16"
@@ -1279,7 +1279,7 @@
     "minimatch" "^3.0.4"
     "strip-json-comments" "^3.1.1"
 
-"@graphql-codegen/cli@^2.2.0":
+"@graphql-codegen/cli@2.2.0":
   "integrity" "sha512-f4EsScASza57aPM1z6eKAaYmwz83B/LsmiyBb8phy1NfbWea2IBUCfEgtvOHN85xbiMpdQfNtckE2mC84yH80w=="
   "resolved" "https://registry.npmjs.org/@graphql-codegen/cli/-/cli-2.2.0.tgz"
   "version" "2.2.0"
@@ -1347,7 +1347,7 @@
     "lodash" "~4.17.0"
     "tslib" "~2.3.0"
 
-"@graphql-codegen/typescript-operations@^2.1.6":
+"@graphql-codegen/typescript-operations@2.1.6":
   "integrity" "sha512-TtvrlLcZNNotxz3UAKBDrPeT1eL2bi1CWwDSzKiViX5lEDiMp40p/Gxa7P/n9n0n5ZfYzrl06Id6l/WMlUy6Kw=="
   "resolved" "https://registry.npmjs.org/@graphql-codegen/typescript-operations/-/typescript-operations-2.1.6.tgz"
   "version" "2.1.6"
@@ -1358,7 +1358,7 @@
     "auto-bind" "~4.0.0"
     "tslib" "~2.3.0"
 
-"@graphql-codegen/typescript-react-apollo@^3.1.4":
+"@graphql-codegen/typescript-react-apollo@3.1.4":
   "integrity" "sha512-XuQ5owAyqaewUU0Je2ye8NWWCcKEo/C/ruEqYHQaFyswCE4KGNbCcfxrl0+dW788qk/NI5dVrConwbH2ze5YnQ=="
   "resolved" "https://registry.npmjs.org/@graphql-codegen/typescript-react-apollo/-/typescript-react-apollo-3.1.4.tgz"
   "version" "3.1.4"
@@ -1369,7 +1369,7 @@
     "change-case-all" "1.0.14"
     "tslib" "~2.3.0"
 
-"@graphql-codegen/typescript@^2.2.2":
+"@graphql-codegen/typescript@^2.2.2", "@graphql-codegen/typescript@2.2.2":
   "integrity" "sha512-prcB4nNi2iQzZRLla6N6kEPmnE2WU1zz5+sEBcZcqphjWERqQ3zwdSKsuLorE/XxMp500p6BQ96cVo+bFkmVtA=="
   "resolved" "https://registry.npmjs.org/@graphql-codegen/typescript/-/typescript-2.2.2.tgz"
   "version" "2.2.2"
@@ -2304,6 +2304,13 @@
   dependencies:
     "@types/node" "*"
 
+"@types/jwt-decode@^3.1.0":
+  "integrity" "sha512-tthwik7TKkou3mVnBnvVuHnHElbjtdbM63pdBCbZTirCt3WAdM73Y79mOri7+ljsS99ZVwUFZHLMxJuJnv/z1w=="
+  "resolved" "https://registry.npmjs.org/@types/jwt-decode/-/jwt-decode-3.1.0.tgz"
+  "version" "3.1.0"
+  dependencies:
+    "jwt-decode" "*"
+
 "@types/minimatch@*":
   "integrity" "sha512-tHq6qdbT9U1IRSGf14CL0pUlULksvY9OZ+5eEgl1N7t+OA3tGvNpxJCzuKQlsNgCVwbAs670L1vcVQi8j9HjnA=="
   "resolved" "https://registry.yarnpkg.com/@types/minimatch/-/minimatch-3.0.3.tgz"
@@ -2985,6 +2992,13 @@
   dependencies:
     "normalize-path" "^3.0.0"
     "picomatch" "^2.0.4"
+
+"apollo-link-token-refresh@^0.3.2":
+  "integrity" "sha512-4us703pt1RyW8NOLCUtCVLbnse2gux43W9mePzfAHKeNsj8d6rzRE4IDIS+6GEb/jay36uw8E7BvX5X9k6Ivkw=="
+  "resolved" "https://registry.npmjs.org/apollo-link-token-refresh/-/apollo-link-token-refresh-0.3.2.tgz"
+  "version" "0.3.2"
+  dependencies:
+    "@apollo/client" "^3.0.0"
 
 "aproba@^1.1.1":
   "integrity" "sha512-Y9J6ZjXtoYh8RnXVCMOU/ttDmk1aBjunq9vO0ta5x85WDQiQfUF9sIPBITdbiiIVcBo03Hi3jMxigBtsddlXRw=="
@@ -8325,6 +8339,11 @@
   dependencies:
     "jwa" "^1.4.1"
     "safe-buffer" "^5.0.1"
+
+"jwt-decode@*", "jwt-decode@^3.1.2":
+  "integrity" "sha512-UfpWE/VZn0iP50d8cz9NrZLM9lSWhcJ+0Gt/nm4by88UL+J1SiKN8/5dkjMmbEzwL2CAe+67GsegCbIKtbp75A=="
+  "resolved" "https://registry.npmjs.org/jwt-decode/-/jwt-decode-3.1.2.tgz"
+  "version" "3.1.2"
 
 "keyv@^3.0.0":
   "integrity" "sha512-9ykJ/46SN/9KPM/sichzQ7OvXyGDYKGTaDlKMGCAlg2UK8KRy4jb0d8sFc+0Tt0YYnThq8X2RZgCg74RPxgcVA=="
