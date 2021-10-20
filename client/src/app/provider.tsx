@@ -121,7 +121,7 @@ function AppStateProvider({ children }: { children: ReactNode }) {
       }),
       requestLink,
       new HttpLink({
-        uri: "/graphql",
+        uri: "https://graphql-user-api.herokuapp.com/graphql",
         credentials: "include",
       }),
     ]),
