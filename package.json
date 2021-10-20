@@ -10,13 +10,16 @@
     "build": "tsc -p",
     "migrate": "ts-node ./node_modules/typeorm/cli.js migration:run",
     "revert": "ts-node ./node_modules/typeorm/cli.js migration:revert",
-    "initdb": "dropdb db_dev; createdb -E UTF8 db_dev;"
+    "initdb": "dropdb db_dev; createdb -E UTF8 db_dev;",
+    "client": "npm start --prefix client",
+    "conc": "concurrently \"nodemon src/app.ts\" \"npm run client\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
     "@types/bcryptjs": "^2.4.2",
+    "@types/concurrently": "^6.3.0",
     "@types/dotenv": "^8.2.0",
     "@types/express": "^4.17.13",
     "@types/express-graphql": "^0.9.0",
@@ -24,6 +27,7 @@
     "@types/pg": "^8.6.1",
     "@types/uuid": "^8.3.1",
     "bcryptjs": "^2.4.3",
+    "concurrently": "^6.3.0",
     "cookie-parser": "^1.4.5",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",

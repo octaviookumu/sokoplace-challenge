@@ -121,7 +121,7 @@ function AppStateProvider({ children }: { children: ReactNode }) {
       }),
       requestLink,
       new HttpLink({
-        uri: "http://localhost:4000/graphql",
+        uri: "https://graphql-user-api.herokuapp.com/graphql",
         credentials: "include",
       }),
     ]),
@@ -152,7 +152,7 @@ export const fetchAccessToken = async (): Promise<any> => {
     variables: {},
     query: "mutation Refresh {\n refresh {\n access_token\n __typename\n}\n}\n",
   };
-  return fetch("http://localhost:4000/graphql", {
+  return fetch("https://graphql-user-api.herokuapp.com/graphql", {
     method: "POST",
     credentials: "include",
     body: JSON.stringify(payload),
